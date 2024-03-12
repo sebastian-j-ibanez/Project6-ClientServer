@@ -1,25 +1,23 @@
-// THIS FILE HAS BEEN INITIALIZED USING A SIMPLE DEMO FROM WEEK 2 OF CSCN72050.
-// THIS CODE HAS BEEN AUTHORED BY DR. COLESHILL, AND IS A PLACEHOLDER FOR OUR SERVER.
-
-#include <windows.networking.sockets.h>
 #include <iostream>
+#include <winsock2.h>
+
 #pragma comment(lib, "Ws2_32.lib")
 
 using namespace std;
 
-void main()
+int main()
 {
 	// Start Winsock DLLs		
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-		return;
+		return -1;
 
 	// Create server socket
 	SOCKET ServerSocket;
-	ServerSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (ServerSocket == INVALID_SOCKET) {
 		WSACleanup();
-		return;
+		return -1;
 	}
 
 	// Bind socket to server address
@@ -31,14 +29,14 @@ void main()
 	{
 		closesocket(ServerSocket);
 		WSACleanup();
-		return;
+		return -1;
 	}
 
 	// Listen on a socket
 	if (listen(ServerSocket, 1) == SOCKET_ERROR) {
 		closesocket(ServerSocket);
 		WSACleanup();
-		return;
+		return -1;
 	}
 
 
@@ -50,7 +48,7 @@ void main()
 	if ((ConnectionSocket = accept(ServerSocket, NULL, NULL)) == SOCKET_ERROR) {
 		closesocket(ServerSocket);
 		WSACleanup();
-		return;
+		return -1;
 	}
 
 	cout << "Connection Established" << endl;
@@ -60,7 +58,9 @@ void main()
 	recv(ConnectionSocket, RxBuffer, sizeof(RxBuffer), 0);
 	cout << "Msg Rx: " << RxBuffer << endl;
 
-	closesocket(ConnectionSocket);	// Close incoming socket
-	closesocket(ServerSocket);	    // Close server socket	
-	WSACleanup();					// Free Winsock resources
+	closesocket(ConnectionSocket);
+	closesocket(ServerSocket);
+	WSACleanup();
+
+	return 0;
 }
