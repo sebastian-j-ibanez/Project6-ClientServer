@@ -1,47 +1,50 @@
-// THIS FILE HAS BEEN INITIALIZED USING A SIMPLE DEMO FROM WEEK 2 OF CSCN72050.
-// THIS CODE HAS BEEN AUTHORED BY DR. COLESHILL, AND IS A PLACEHOLDER FOR OUR CLIENT.
+#include <iostream>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include "..\Project6-Server\Protocol.hpp"
 
-#include <windows.networking.sockets.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-#include <iostream>
-using namespace std;
+#define PORT 27000
+#define SERVER_ADDR L"127.0.0.1"
 
-void main()
+int main()
 {
 	// Start Winsock DLLs
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
-		return;
+		return -1;
 	}
 
 	// Initialize client socket. Set SOCK_STREAM to TCP.
-	SOCKET ClientSocket;
-	ClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (ClientSocket == INVALID_SOCKET) {
+	SOCKET client_socket;
+	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (client_socket == INVALID_SOCKET) {
 		WSACleanup();
-		return;
+		return -1;
 	}
 
-	// Connect socket to specified server
-	sockaddr_in SvrAddr;
-	SvrAddr.sin_family = AF_INET;						// Address family type internet
-	SvrAddr.sin_port = htons(27000);					// Port (host to network conversion)
-	SvrAddr.sin_addr.s_addr = inet_addr("127.0.0.1");	// IP address
-	if ((connect(ClientSocket, (struct sockaddr*)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR) {
-		closesocket(ClientSocket);
-		WSACleanup();
-		return;
-	}
+	// Create socket address for server.
+	// Set family to AF_INET for UDP, set port, set IP address.
+	sockaddr_in svr_addr;
+	svr_addr.sin_family = AF_INET;
+	svr_addr.sin_port = htons(PORT);
+	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
 
-	char TxBuffer[128] = {};
-	cout << "Enter a String to transmit" << endl;
-	cin >> TxBuffer;
-	send(ClientSocket, TxBuffer, sizeof(TxBuffer), 0);
+	// Initialize data.
+	PlanePacket data = {
+		1,
+		time(NULL),
+		39.5,
+		false
+	};
 
-	// Close connection and socket
-	closesocket(ClientSocket);
+	// Send data to server through client socket.
+	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
 
-	// Free Winsock DLL resources
+	// Close socket and clean WSA.
+	closesocket(client_socket);
 	WSACleanup();
+
+	return 0;
 }
