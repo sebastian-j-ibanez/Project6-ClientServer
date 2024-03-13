@@ -1,65 +1,59 @@
 #include <iostream>
 #include <winsock2.h>
+#include "Protocol.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 
-using namespace std;
+#define PORT 27000
 
 int main()
 {
 	// Start Winsock DLLs		
-	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	WSADATA wsa_data;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
 		return -1;
 
 	// Create server socket
-	SOCKET ServerSocket;
-	ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (ServerSocket == INVALID_SOCKET) {
+	SOCKET server_socket;
+	server_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (server_socket == INVALID_SOCKET) {
 		WSACleanup();
 		return -1;
 	}
 
 	// Bind socket to server address
-	sockaddr_in SvrAddr;
-	SvrAddr.sin_family = AF_INET;
-	SvrAddr.sin_addr.s_addr = INADDR_ANY;
-	SvrAddr.sin_port = htons(27000);
-	if (bind(ServerSocket, (struct sockaddr*)&SvrAddr, sizeof(SvrAddr)) == SOCKET_ERROR)
+	sockaddr_in svr_addr;
+	svr_addr.sin_family = AF_INET;
+	svr_addr.sin_addr.s_addr = INADDR_ANY;
+	svr_addr.sin_port = htons(PORT);
+	
+	// Bind socket to address and check for errors.
+	if (bind(server_socket, (struct sockaddr*)&svr_addr, sizeof(svr_addr)) == SOCKET_ERROR)
 	{
-		closesocket(ServerSocket);
+		closesocket(server_socket);
 		WSACleanup();
 		return -1;
 	}
-
-	// Listen on a socket
-	if (listen(ServerSocket, 1) == SOCKET_ERROR) {
-		closesocket(ServerSocket);
-		WSACleanup();
-		return -1;
-	}
-
-
-	cout << "Waiting for client connection\n" << endl;
-
-	// Accept a connection from a client
-	SOCKET ConnectionSocket;
-	ConnectionSocket = SOCKET_ERROR;
-	if ((ConnectionSocket = accept(ServerSocket, NULL, NULL)) == SOCKET_ERROR) {
-		closesocket(ServerSocket);
-		WSACleanup();
-		return -1;
-	}
-
-	cout << "Connection Established" << endl;
 
 	// Receive message from Connection Socket.
-	char RxBuffer[128] = {};
-	recv(ConnectionSocket, RxBuffer, sizeof(RxBuffer), 0);
-	cout << "Msg Rx: " << RxBuffer << endl;
+	while (true) {
+		PlanePacket received_data = {};
+		sockaddr_in clt_addr;
+		int clt_addr_size = sizeof(clt_addr);
+		int bytes = recvfrom(server_socket, (char*)&received_data, sizeof(PlanePacket), 0, (sockaddr*)&clt_addr, &clt_addr_size);
+		
+		if (bytes == SOCKET_ERROR) {
+			closesocket(server_socket);
+			WSACleanup();
+			return -1;
+		}
 
-	closesocket(ConnectionSocket);
-	closesocket(ServerSocket);
+		std::cout << "Received: " << std:: endl;
+		std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
+	}
+
+	// Close socket and cleanup WSA.
+	closesocket(server_socket);
 	WSACleanup();
 
 	return 0;
