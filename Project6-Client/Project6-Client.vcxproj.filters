@@ -18,6 +18,9 @@
     <ClCompile Include="Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Project6-Server\Protocol.hpp">
