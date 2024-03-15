@@ -1,6 +1,8 @@
 #include <iostream>
 #include <winsock2.h>
 #include "Protocol.hpp"
+#include "ThreadPool.hpp"
+#include "PacketHandler.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -8,6 +10,10 @@
 
 int main()
 {
+	//Init thread pool
+	Thread_Pool tp;
+	tp.Start(4);
+
 	// Start Winsock DLLs		
 	WSADATA wsa_data;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
@@ -47,6 +53,9 @@ int main()
 			WSACleanup();
 			return -1;
 		}
+
+		//handling here
+		tp.PostJob(PacketHandler::HandleData, received_data);
 
 		std::cout << "Received: " << std:: endl;
 		std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;

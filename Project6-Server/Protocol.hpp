@@ -11,3 +11,4 @@ struct PlanePacket {
     float FuelLevel;
     bool EndTransmission;
 };
+
