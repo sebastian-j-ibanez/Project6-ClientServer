@@ -6,6 +6,6 @@ class PacketHandler {
 public:
 	static void HandleData(PlanePacket pkt)
 	{
-
+		pkt.Print();
 	}
 };

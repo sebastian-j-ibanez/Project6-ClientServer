@@ -57,8 +57,8 @@ int main()
 		//handling here
 		tp.PostJob(PacketHandler::HandleData, received_data);
 
-		std::cout << "Received: " << std:: endl;
-		std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
+		//std::cout << "Received: " << std:: endl;
+		//std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
 	}
 
 	// Close socket and cleanup WSA.
