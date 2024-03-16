@@ -131,6 +131,7 @@
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileIO.hpp" />
     <ClInclude Include="PacketHandler.hpp" />
     <ClInclude Include="Protocol.hpp" />
     <ClInclude Include="ThreadPool.hpp" />
