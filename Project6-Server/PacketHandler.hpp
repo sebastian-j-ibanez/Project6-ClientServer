@@ -3,6 +3,8 @@
 #include "PlaneData.hpp"
 #include "FileIO.hpp"
 #include <iostream>
+#include <unordered_map>
+#include <mutex>
 #include <map>
 #include <ctime>
 
@@ -28,5 +30,15 @@ public:
 		// Write average to file if last packet of data transmission
 		if (pkt.EndTransmission)
 			WriteToFile(pkt.Id, *currentPlaneData);
+	}
+	static void HandleData(PlanePacket pkt, std::unordered_map<int, planeData> *planeData, std::unordered_map<int, bool> *dataLocks, std::mutex *dataLocksLock)
+	{
+		//process data
+		pkt.Print();
+
+		//release lock
+		dataLocksLock->lock();
+		(*dataLocks)[pkt.Id] = false;
+		dataLocksLock->unlock();
 	}
 };
