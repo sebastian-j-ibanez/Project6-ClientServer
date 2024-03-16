@@ -99,10 +99,8 @@ int main()
             false
         };
 
-		// Send data to server through client socket.
-		sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
-
-	}
+	// Send data to server through client socket.
+	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
 
 	// Close socket and clean WSA.
 	closesocket(client_socket);
