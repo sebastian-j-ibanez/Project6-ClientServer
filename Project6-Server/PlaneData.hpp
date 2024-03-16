@@ -7,7 +7,7 @@ struct planeData {
 	float fuelCompAvg;
     time_t initialTime;
 	float initialFuel;
-    int numTrans;
+	int numTrans;
 
     // Default constructor sets all values to 0
     planeData()     
