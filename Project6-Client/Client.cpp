@@ -31,16 +31,21 @@ int main()
 	svr_addr.sin_port = htons(PORT);
 	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
 
-	// Initialize data.
-	PlanePacket data = {
-		1,
-		time(NULL),
-		39.5,
-		false
-	};
 
-	// Send data to server through client socket.
-	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+
+	while (true) {
+		// Initialize data.
+		PlanePacket data = {
+			rand() % 100,
+			time(NULL),
+			39.5,
+			false
+		};
+
+		// Send data to server through client socket.
+		sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+
+	}
 
 	// Close socket and clean WSA.
 	closesocket(client_socket);
