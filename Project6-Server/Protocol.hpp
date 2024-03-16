@@ -3,6 +3,7 @@
 #include <time.h>
 #include <sstream>
 
+
 /// <summary>
 /// Packet containing flight data.
 /// </summary>

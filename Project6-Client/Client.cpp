@@ -35,36 +35,14 @@ int main()
 	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
 
 	// Initialize data.
-	PlanePacket data = {
-		1,
-		time(NULL),
-		39.5,
-		false
-	};
-
-	// Send data to server through client socket.
-	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
-
-	// Close socket and clean WSA.
-	closesocket(client_socket);
-	WSACleanup();
-
-	return 0;
-}
-
-int parse()
-{
 
     ifstream TelemFile;
     TelemFile.open("katl-kefd-B737-700.txt");
-
-
     if (!TelemFile.is_open())
     {
         cout << "File Failed to Open" << endl;
-        return 0;
+        return 1;
     }
-
     double CurrentFuelAverage = 0; // The current average of the fuel Consumptation
     double CurrentFuel; // The current Fuel passed in a specific Line
     string CurrentFuelString; // we cant use ss on a double so we use this as a placeholder
@@ -77,7 +55,6 @@ int parse()
     string Line; // Current Line we are reading
     string Discarded; // Discared part of the string that we are not using, gets discarded
     int LineNumber = 1;
-
     getline(TelemFile, Line);
     do
     {
@@ -101,12 +78,46 @@ int parse()
 
         TotalFuel += CurrentFuel;
 
-        CurrentFuelAverage = (TotalFuel / LineNumber); // Calculating the Average
+        // CurrentFuelAverage = (TotalFuel / LineNumber); // Calculating the Average
 
-        cout << CurrentFuel << endl; // currently prints CurrentFuel that gets passed in a line, can change to other values
+        PlanePacket data = {
+        1,
+        CurrentTime,
+        CurrentFuel,
+        false
+        };
 
         LineNumber++; // we can use the line number to keep track of the total number of current fuels for the average
         getline(TelemFile, Line);
 
     } while (!TelemFile.eof());
+
+
+	PlanePacket data = {
+		1,
+		time(NULL),
+		39.5,
+		false
+	};
+
+	// Send data to server through client socket.
+	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+
+	// Close socket and clean WSA.
+	closesocket(client_socket);
+	WSACleanup();
+
+	return 0;
+}
+
+time_t TimeConvert(string TimeString)
+{
+    std::tm tm = {};
+    std::istringstream ss(TimeString);
+    ss >> std::get_time(&tm, "%H:%M:%S");
+    if (ss.fail()) {
+        std::cerr << "Error parsing time string" << std::endl;
+        // Handle parsing failure here, if needed
+    }
+    return std::mktime(&tm);
 }
