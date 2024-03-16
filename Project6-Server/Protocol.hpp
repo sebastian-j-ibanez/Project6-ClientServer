@@ -3,19 +3,22 @@
 #include <time.h>
 #include <sstream>
 
-/// <summary>
-/// Packet containing flight data.
-/// </summary>
+// Packet containing flight data.
 struct PlanePacket {
     int Id;
     time_t Timestamp;
     float FuelLevel;
     bool EndTransmission;
 
-    void Print() {
+    //  Return formatted string with PlanePacket fields.
+    std::string ToString() {
         std::stringstream ss;
         ss << "Id:" << Id << " Timestamp: " << Timestamp << " FuelLevel: " << FuelLevel << " EndTransmission: " << EndTransmission;
-        std::cout << ss.str() << std::endl;
+        return ss.str();
+    }
+
+    // Print PlanePacket to std::cout.
+    void Print() {
+        std::cout << ToString() << std::endl;
     }
 };
-
