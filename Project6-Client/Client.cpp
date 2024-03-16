@@ -116,6 +116,8 @@ int main()
 
 	}
 
+	}
+
 	// Close socket and clean WSA.
 	closesocket(client_socket);
 	WSACleanup();
