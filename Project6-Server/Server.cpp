@@ -61,7 +61,8 @@ int main()
 		//handling here
 		tp.PostJob(PacketHandler::HandleData, received_data, &planeDataMap[received_data.Id]);
 
-		planeDataMap[received_data.Id].Print();
+		planeDataMap[received_data.Id].Print();		// Was just checking to make sure the changes saved outside the function
+		received_data.Print();
 		//std::cout << "Received: " << std:: endl;
 		//std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
 	}

@@ -20,7 +20,7 @@ void WriteToFile(int id, planeData data) {
 
     // Check file stream status, write data to file, and close file.
     if (file.is_open()) {
-        file << "Id:" << string_id << '\n' << data.ToString() << '\n';
+        file << "Id: " << string_id << '\n' << data.ToString() << '\n';
         file.close();
     }
     else {

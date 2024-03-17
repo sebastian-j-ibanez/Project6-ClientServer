@@ -21,7 +21,7 @@ struct planeData {
     // Return formatted string with PlaneData fields.
     std::string ToString() {
         std::stringstream ss;
-        ss << "Fuel Consumption Average:" << fuelCompAvg * 1000 << "mL/s" << std::endl << "Number of transmissions:" << numTrans << std::endl;
+        ss << "Fuel Consumption Average: " << fuelCompAvg * 1000 << "mL/s" << std::endl << "Number of transmissions: " << numTrans << std::endl;
         return ss.str();
     }
 
