@@ -13,7 +13,7 @@ REM Execute a command for the specified number of iterations
 FOR /L %%x IN (1, 1, %userInput%) DO (
 	ECHO Iteration %%x
 	
-	"client.exe" "%UniqueID%"
+	REM "client.exe" "%UniqueID%"
 )
 
 SET /P endMenu=Press the enter key to end program: 
