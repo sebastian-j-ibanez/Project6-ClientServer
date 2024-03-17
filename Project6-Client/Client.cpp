@@ -12,7 +12,27 @@
 #define PORT 27000
 #define SERVER_ADDR L"127.0.0.1"
 #define DATE "2024-03-17 "
+
+
 using namespace std;
+
+// Converts string formatted as H:M:S into time_t object.
+time_t TimeConvert(string TimeString)
+{
+    // Format TimeString and initialize tm using get_time.
+    TimeString = DATE + TimeString;
+    std::istringstream ss(TimeString);
+    struct std::tm tm = { 0 };
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    // Check for parsing errors
+    if (ss.fail()) {
+        std::cerr << "Error parsing time string" << std::endl;
+    }
+    // Convert tm to time_t and return value.
+    std::time_t time = std::mktime(&tm);
+    return time;
+}
+
 int main()
 {
 	// Start Winsock DLLs
@@ -100,22 +120,3 @@ int main()
 
 	return 0;
 }
-
-// Converts string formatted as H:M:S into time_t object.
-time_t TimeConvert(string TimeString)
-{
-    // Format TimeString and initialize tm using get_time.
-    TimeString = DATE + TimeString;
-    std::istringstream ss(TimeString);
-    struct std::tm tm = { 0 };
-    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-    // Check for parsing errors
-    if (ss.fail()) {
-        std::cerr << "Error parsing time string" << std::endl;
-    }
-    // Convert tm to time_t and return value.
-    std::time_t time = std::mktime(&tm);
-    return time;
-}
-
-
