@@ -16,7 +16,7 @@ int main()
 		return -1;
 	}
 
-	// Initialize client socket. Set SOCK_STREAM to TCP.
+	// Initialize client socket. Set SOCK_STREAM to UDP.
 	SOCKET client_socket;
 	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (client_socket == INVALID_SOCKET) {
@@ -35,7 +35,7 @@ int main()
 	PlanePacket data = {
 		1,
 		time(NULL),
-		39.5,
+		41.702572,
 		false
 	};
 

@@ -15,6 +15,8 @@ int main()
 	//Init thread pool
 	Thread_Pool tp;
 	tp.Start(4);
+	// Create map to hold plane data
+	std::map<int, planeData> planeDataMap;
 
 	// Start Winsock DLLs		
 	WSADATA wsa_data;
@@ -57,8 +59,9 @@ int main()
 		}
 
 		//handling here
-		tp.PostJob(PacketHandler::HandleData, received_data);
+		tp.PostJob(PacketHandler::HandleData, received_data, &planeDataMap[received_data.Id]);
 
+		planeDataMap[received_data.Id].Print();
 		//std::cout << "Received: " << std:: endl;
 		//std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
 	}
