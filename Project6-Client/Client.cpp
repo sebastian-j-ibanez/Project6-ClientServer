@@ -1,15 +1,17 @@
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include "..\Project6-Server\Protocol.hpp"
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iomanip>
+#include "..\Project6-Server\Protocol.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define PORT 27000
 #define SERVER_ADDR L"127.0.0.1"
+#define DATE "2024-03-17 "
 using namespace std;
 int main()
 {
@@ -43,65 +45,54 @@ int main()
         cout << "File Failed to Open" << endl;
         return 1;
     }
-    double CurrentFuelAverage = 0; // The current average of the fuel Consumptation
-    double CurrentFuel; // The current Fuel passed in a specific Line
+    const int id = 1; // temporary ID for PlanePacket
+    float CurrentFuel; // The current Fuel passed in a specific Line
     string CurrentFuelString; // we cant use ss on a double so we use this as a placeholder
-    double TotalFuel = 0; // The total fuel that gets summed by every fuel value
-
-
+    time_t Time;
     string CurrentTime; // The current time passed in a specific line, need to convert to time_t
-    string LatestTimeInterval; // Latest time for the 10 second time interval, Not Used currently
 
     string Line; // Current Line we are reading
     string Discarded; // Discared part of the string that we are not using, gets discarded
-    int LineNumber = 1;
-    getline(TelemFile, Line);
-    do
-    {
+
+    // Remove first line (only contains column names).
+    std::getline(TelemFile, Line);
+
+    // Read file by line. Parse each line for CurrentTime and CurrentFuel.
+    while (std::getline(TelemFile, Line)) {
 
         istringstream ss(Line);
 
-        if (LineNumber == 1) // skip FUEL TOTAL QUANTITY in the first line
-        {
-            getline(ss, Discarded, ',');
-        }
-        else
-        {
-            getline(ss, Discarded, ' ');
+        // Get rid of time stamp at beginning of line.
+        std::getline(ss, Discarded, ' ');
 
-        }
-        getline(ss, CurrentTime, ',');
-        CurrentTime = CurrentTime.substr(9, 8); // we do not need the date, only the time
+        // Get CurrentTime (HH:MM:SS format) and convert to time_t.
+        std::getline(ss, CurrentTime, ',');
+        Time = TimeConvert(CurrentTime);
 
-        getline(ss, CurrentFuelString, ','); // next section of the line will be the Fuel
-        CurrentFuel = stod(CurrentFuelString); // convert the String Current Fuel to a Double
-
-        TotalFuel += CurrentFuel;
-
-        // CurrentFuelAverage = (TotalFuel / LineNumber); // Calculating the Average
+        std::getline(ss, CurrentFuelString, ','); // Next section of the line will be the Fuel
+        CurrentFuel = stof(CurrentFuelString); // Convert the String Current Fuel to a float
 
         PlanePacket data = {
-        1,
-        CurrentTime,
-        CurrentFuel,
-        false
+            id,
+            Time,
+            CurrentFuel,
+            false
         };
 
-        LineNumber++; // we can use the line number to keep track of the total number of current fuels for the average
-        getline(TelemFile, Line);
+        // Send data to server through client socket.
+        sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+    }
 
-    } while (!TelemFile.eof());
+    // Send packet with endTransmission flag set.
+    PlanePacket endPacket = {
+        id, 
+        time(NULL),
+        0,
+        true
+    };
 
-
-	PlanePacket data = {
-		1,
-		time(NULL),
-		39.5,
-		false
-	};
-
-	// Send data to server through client socket.
-	sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+    // Send endPacket to server through client socket.
+    sendto(client_socket, (char*)&endPacket, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
 
 	// Close socket and clean WSA.
 	closesocket(client_socket);
@@ -110,14 +101,21 @@ int main()
 	return 0;
 }
 
+// Converts string formatted as H:M:S into time_t object.
 time_t TimeConvert(string TimeString)
 {
-    std::tm tm = {};
+    // Format TimeString and initialize tm using get_time.
+    TimeString = DATE + TimeString;
     std::istringstream ss(TimeString);
-    ss >> std::get_time(&tm, "%H:%M:%S");
+    struct std::tm tm = { 0 };
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    // Check for parsing errors
     if (ss.fail()) {
         std::cerr << "Error parsing time string" << std::endl;
-        // Handle parsing failure here, if needed
     }
-    return std::mktime(&tm);
+    // Convert tm to time_t and return value.
+    std::time_t time = std::mktime(&tm);
+    return time;
 }
+
+
