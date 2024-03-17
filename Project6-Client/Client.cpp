@@ -33,8 +33,12 @@ time_t TimeConvert(string TimeString)
     return time;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+
+    const int id =  atoi(argv[1]); // get ID for PlanePacket from argv
+    cout << id << " this is the thing" << endl;
+
 	// Start Winsock DLLs
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
@@ -65,7 +69,7 @@ int main()
         cout << "File Failed to Open" << endl;
         return 1;
     }
-    const int id = 1; // temporary ID for PlanePacket
+    
     float CurrentFuel; // The current Fuel passed in a specific Line
     string CurrentFuelString; // we cant use ss on a double so we use this as a placeholder
     time_t Time;
