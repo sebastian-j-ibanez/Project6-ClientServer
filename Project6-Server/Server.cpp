@@ -3,6 +3,8 @@
 #include "Protocol.hpp"
 #include "ThreadPool.hpp"
 #include "PacketHandler.hpp"
+#include "PlaneData.hpp"
+#include "FileIO.hpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 
