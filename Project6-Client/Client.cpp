@@ -106,6 +106,7 @@ int main(int argc, char* argv[])
         };
 
         // Send data to server through client socket.
+        Sleep(1000);
         sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
     }
 
