@@ -18,7 +18,7 @@ public:
 			currentPlaneData->initialTime = pkt.Timestamp;
 		}
 		// Create a fuelCompAvg if this is the second trasmission or the tenth transmission since the last Avg calculation. Also calculate avg on last transmission
-		else if (currentPlaneData->numTrans == 2 || (currentPlaneData->numTrans % 10 == 0 && currentPlaneData->numTrans != 0) || pkt.EndTransmission)
+		else if (!pkt.EndTransmission)
 		{
 			float fuelDif = ((pkt.FuelLevel - currentPlaneData->initialFuel) * -1);		// Multiply by -1 because the difference causes a negative but should be reflected by a positive in terms of consumption of fuel per second
 			double timeDif = difftime(pkt.Timestamp, currentPlaneData->initialTime);	// difftime should return the amount of seconds between the end time and the start time
