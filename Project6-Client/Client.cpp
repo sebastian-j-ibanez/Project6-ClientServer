@@ -35,28 +35,28 @@ time_t TimeConvert(string TimeString)
 
 int main()
 {
-	// Start Winsock DLLs
-	WSADATA wsaData;
-	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
-		return -1;
-	}
+    // Start Winsock DLLs
+    WSADATA wsaData;
+    if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
+        return -1;
+    }
 
-	// Initialize client socket. Set SOCK_STREAM to UDP.
-	SOCKET client_socket;
-	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (client_socket == INVALID_SOCKET) {
-		WSACleanup();
-		return -1;
-	}
+    // Initialize client socket. Set SOCK_STREAM to UDP.
+    SOCKET client_socket;
+    client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (client_socket == INVALID_SOCKET) {
+        WSACleanup();
+        return -1;
+    }
 
-	// Create socket address for server.
-	// Set family to AF_INET for UDP, set port, set IP address.
-	sockaddr_in svr_addr;
-	svr_addr.sin_family = AF_INET;
-	svr_addr.sin_port = htons(PORT);
-	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
+    // Create socket address for server.
+    // Set family to AF_INET for UDP, set port, set IP address.
+    sockaddr_in svr_addr;
+    svr_addr.sin_family = AF_INET;
+    svr_addr.sin_port = htons(PORT);
+    InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
 
-	// Initialize data.
+    // Initialize data.
 
     ifstream TelemFile;
     TelemFile.open("katl-kefd-B737-700.txt");
@@ -103,9 +103,20 @@ int main()
         sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
     }
 
-	// Close socket and clean WSA.
-	closesocket(client_socket);
-	WSACleanup();
+    // Send packet with endTransmission flag set.
+    PlanePacket endPacket = {
+        id,
+        time(NULL),
+        0,
+        true
+    };
 
-	return 0;
+    // Send endPacket to server through client socket.
+    sendto(client_socket, (char*)&endPacket, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
+
+    // Close socket and clean WSA.
+    closesocket(client_socket);
+    WSACleanup();
+
+    return 0;
 }

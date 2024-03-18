@@ -57,6 +57,8 @@ int main()
 		int clt_addr_size = sizeof(clt_addr);
 		int bytes = recvfrom(server_socket, (char*)&received_data, sizeof(PlanePacket), 0, (sockaddr*)&clt_addr, &clt_addr_size);
 		
+		received_data.Print();
+
 		if (bytes == SOCKET_ERROR) {
 			closesocket(server_socket);
 			WSACleanup();
@@ -69,7 +71,7 @@ int main()
 			planeLocksLock.lock();
 			planeLocks[received_data.Id] = true;
 			planeLocksLock.unlock();
-			tp.PostJob(PacketHandler::HandleData, received_data, &planeList, &planeLocks, &planeLocksLock);
+			tp.PostJob(PacketHandler::HandleData, received_data, &planeList[received_data.Id], &planeLocks, &planeLocksLock);
 		}
 		else {
 			//send to intermediate queue
@@ -84,7 +86,7 @@ int main()
 				planeLocksLock.lock();
 				planeLocks[iterator->Id] = true;
 				planeLocksLock.unlock();
-				tp.PostJob(PacketHandler::HandleData, *iterator, &planeList, &planeLocks, &planeLocksLock);
+				tp.PostJob(PacketHandler::HandleData, *iterator, &planeList[iterator->Id], &planeLocks, &planeLocksLock);
 				iterator = messageQueue.erase(iterator);
 			}
 		}

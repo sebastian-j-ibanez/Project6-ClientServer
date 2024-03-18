@@ -10,7 +10,7 @@
 
 class PacketHandler {
 public:
-	static void HandleData(PlanePacket pkt, planeData* currentPlaneData)
+	static void HandleData(PlanePacket pkt, planeData* currentPlaneData, std::unordered_map<int, bool>* dataLocks, std::mutex* dataLocksLock)
 	{
 		currentPlaneData->numTrans++;
 		// If first transmission of this plane's data, set initialFuel and initialTime values for future calculations
@@ -30,11 +30,6 @@ public:
 		// Write average to file if last packet of data transmission
 		if (pkt.EndTransmission)
 			WriteToFile(pkt.Id, *currentPlaneData);
-	}
-	static void HandleData(PlanePacket pkt, std::unordered_map<int, planeData> *planeData, std::unordered_map<int, bool> *dataLocks, std::mutex *dataLocksLock)
-	{
-		//process data
-		pkt.Print();
 
 		//release lock
 		dataLocksLock->lock();
