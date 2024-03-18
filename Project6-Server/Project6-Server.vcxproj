@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PlaneData.hpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
