@@ -103,19 +103,6 @@ int main()
         sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
     }
 
-    // Send packet with endTransmission flag set.
-    PlanePacket endPacket = {
-        id, 
-        time(NULL),
-        0,
-        true
-    };
-
-    // Send endPacket to server through client socket.
-    sendto(client_socket, (char*)&endPacket, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
-
-	}
-
 	// Close socket and clean WSA.
 	closesocket(client_socket);
 	WSACleanup();
