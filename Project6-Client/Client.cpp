@@ -36,7 +36,7 @@ int main()
 	while (true) {
 		// Initialize data.
 		PlanePacket data = {
-			rand() % 100,
+			1,
 			time(NULL),
 			39.5,
 			false
@@ -45,6 +45,7 @@ int main()
 		// Send data to server through client socket.
 		sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
 
+		//Sleep(1);
 	}
 
 	// Close socket and clean WSA.

@@ -75,16 +75,16 @@ int main()
 			messageQueue.push_back(received_data);
 		}
 
-		//QuIt = messageQueue.begin();
 		//process intermediate queue
-		for (auto const& iterator : messageQueue) {
+		for (auto iterator = messageQueue.begin(); iterator != messageQueue.end();) {
 			//if the plane is not locked
-			if (planeLocks[iterator.Id] == false) {
+			if (planeLocks[iterator->Id] == false) {
 				//dequeue task and post it to the threads
 				planeLocksLock.lock();
-				planeLocks[received_data.Id] = true;
+				planeLocks[iterator->Id] = true;
 				planeLocksLock.unlock();
-				tp.PostJob(PacketHandler::HandleData, received_data, &planeList, &planeLocks, &planeLocksLock);
+				tp.PostJob(PacketHandler::HandleData, *iterator, &planeList, &planeLocks, &planeLocksLock);
+				iterator = messageQueue.erase(iterator);
 			}
 		}
 	}
