@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
     const int id =  atoi(argv[1]); // get ID for PlanePacket from argv
     cout << id << " this is the thing" << endl;
 
+
 	// Start Winsock DLLs
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
@@ -63,10 +64,13 @@ int main(int argc, char* argv[])
 	// Initialize data.
 
     ifstream TelemFile;
-    TelemFile.open("katl-kefd-B737-700.txt");
+    TelemFile.open("katl-kefd-B737-700.txt", std::ifstream::in);
     if (!TelemFile.is_open())
     {
         cout << "File Failed to Open" << endl;
+        string temp;
+        cin >> temp;
+
         return 1;
     }
     
@@ -121,6 +125,7 @@ int main(int argc, char* argv[])
 	// Close socket and clean WSA.
 	closesocket(client_socket);
 	WSACleanup();
+
 
 	return 0;
 }
