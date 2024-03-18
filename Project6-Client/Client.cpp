@@ -33,39 +33,45 @@ time_t TimeConvert(string TimeString)
     return time;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    // Start Winsock DLLs
-    WSADATA wsaData;
-    if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
-        return -1;
-    }
+    const int id =  atoi(argv[1]); // get ID for PlanePacket from argv
+    cout << id << " this is the thing" << endl;
 
-    // Initialize client socket. Set SOCK_STREAM to UDP.
-    SOCKET client_socket;
-    client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (client_socket == INVALID_SOCKET) {
-        WSACleanup();
-        return -1;
-    }
 
-    // Create socket address for server.
-    // Set family to AF_INET for UDP, set port, set IP address.
-    sockaddr_in svr_addr;
-    svr_addr.sin_family = AF_INET;
-    svr_addr.sin_port = htons(PORT);
-    InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
+	// Start Winsock DLLs
+	WSADATA wsaData;
+	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
+		return -1;
+	}
 
-    // Initialize data.
+	// Initialize client socket. Set SOCK_STREAM to UDP.
+	SOCKET client_socket;
+	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (client_socket == INVALID_SOCKET) {
+		WSACleanup();
+		return -1;
+	}
 
+	// Create socket address for server.
+	// Set family to AF_INET for UDP, set port, set IP address.
+	sockaddr_in svr_addr;
+	svr_addr.sin_family = AF_INET;
+	svr_addr.sin_port = htons(PORT);
+	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
+
+	// Initialize data.
     ifstream TelemFile;
-    TelemFile.open("katl-kefd-B737-700.txt");
+    TelemFile.open("katl-kefd-B737-700.txt", std::ifstream::in);
     if (!TelemFile.is_open())
     {
         cout << "File Failed to Open" << endl;
+        string temp;
+        cin >> temp;
+
         return 1;
     }
-    const int id = 1; // temporary ID for PlanePacket
+    
     float CurrentFuel; // The current Fuel passed in a specific Line
     string CurrentFuelString; // we cant use ss on a double so we use this as a placeholder
     time_t Time;
@@ -118,5 +124,5 @@ int main()
     closesocket(client_socket);
     WSACleanup();
 
-    return 0;
+	return 0;
 }
