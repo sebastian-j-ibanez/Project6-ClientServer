@@ -116,6 +116,7 @@ int main()
 
 	}
 
+		//Sleep(1);
 	}
 
 	// Close socket and clean WSA.
