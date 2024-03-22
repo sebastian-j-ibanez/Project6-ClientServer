@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// Initialize client socket. Set SOCK_STREAM to TCP.
+	// Initialize client socket. Set SOCK_STREAM to UDP.
 	SOCKET client_socket;
 	client_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (client_socket == INVALID_SOCKET) {
