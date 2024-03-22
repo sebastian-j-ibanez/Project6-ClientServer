@@ -35,7 +35,6 @@ time_t TimeConvert(string TimeString)
 
 int main(int argc, char* argv[])
 {
-
     const int id =  atoi(argv[1]); // get ID for PlanePacket from argv
     cout << id << " this is the thing" << endl;
 
@@ -62,7 +61,6 @@ int main(int argc, char* argv[])
 	InetPtonW(AF_INET, SERVER_ADDR, &svr_addr.sin_addr.s_addr);
 
 	// Initialize data.
-
     ifstream TelemFile;
     TelemFile.open("katl-kefd-B737-700.txt", std::ifstream::in);
     if (!TelemFile.is_open())
@@ -108,12 +106,13 @@ int main(int argc, char* argv[])
         };
 
         // Send data to server through client socket.
+        Sleep(1000);
         sendto(client_socket, (char*)&data, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
     }
 
     // Send packet with endTransmission flag set.
     PlanePacket endPacket = {
-        id, 
+        id,
         time(NULL),
         0,
         true
@@ -122,10 +121,9 @@ int main(int argc, char* argv[])
     // Send endPacket to server through client socket.
     sendto(client_socket, (char*)&endPacket, sizeof(PlanePacket), 0, (sockaddr*)&svr_addr, sizeof(svr_addr));
 
-	// Close socket and clean WSA.
-	closesocket(client_socket);
-	WSACleanup();
-
+    // Close socket and clean WSA.
+    closesocket(client_socket);
+    WSACleanup();
 
 	return 0;
 }

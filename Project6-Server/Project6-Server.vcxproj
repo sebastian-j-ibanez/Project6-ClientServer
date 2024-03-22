@@ -127,12 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PlaneData.hpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileIO.hpp" />
     <ClInclude Include="PacketHandler.hpp" />
+    <ClInclude Include="PlaneData.hpp" />
     <ClInclude Include="Protocol.hpp" />
     <ClInclude Include="ThreadPool.hpp" />
   </ItemGroup>

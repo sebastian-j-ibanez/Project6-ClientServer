@@ -3,12 +3,14 @@
 #include "PlaneData.hpp"
 #include "FileIO.hpp"
 #include <iostream>
+#include <unordered_map>
+#include <mutex>
 #include <map>
 #include <ctime>
 
 class PacketHandler {
 public:
-	static void HandleData(PlanePacket pkt, planeData* currentPlaneData)
+	static void HandleData(PlanePacket pkt, planeData* currentPlaneData, std::unordered_map<int, bool>* dataLocks, std::mutex* dataLocksLock)
 	{
 		currentPlaneData->numTrans++;
 		// If first transmission of this plane's data, set initialFuel and initialTime values for future calculations
@@ -28,5 +30,10 @@ public:
 		// Write average to file if last packet of data transmission
 		if (pkt.EndTransmission)
 			WriteToFile(pkt.Id, *currentPlaneData);
+
+		//release lock
+		dataLocksLock->lock();
+		(*dataLocks)[pkt.Id] = false;
+		dataLocksLock->unlock();
 	}
 };

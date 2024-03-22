@@ -3,8 +3,10 @@
 #include "Protocol.hpp"
 #include "ThreadPool.hpp"
 #include "PacketHandler.hpp"
-#include "PlaneData.hpp"
 #include "FileIO.hpp"
+#include <unordered_map>
+#include "PlaneData.hpp"
+#include <mutex>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -15,8 +17,11 @@ int main()
 	//Init thread pool
 	Thread_Pool tp;
 	tp.Start(4);
-	// Create map to hold plane data
-	std::map<int, planeData> planeDataMap;
+	std::unordered_map<int, planeData> planeList;
+	std::unordered_map<int, bool> planeLocks;
+	std::mutex planeLocksLock; //lol
+	std::list<PlanePacket> messageQueue;
+	std::list<PlanePacket>::iterator QuIt;
 
 	// Start Winsock DLLs		
 	WSADATA wsa_data;
@@ -52,19 +57,39 @@ int main()
 		int clt_addr_size = sizeof(clt_addr);
 		int bytes = recvfrom(server_socket, (char*)&received_data, sizeof(PlanePacket), 0, (sockaddr*)&clt_addr, &clt_addr_size);
 		
+		received_data.Print();
+
 		if (bytes == SOCKET_ERROR) {
 			closesocket(server_socket);
 			WSACleanup();
 			return -1;
 		}
 
-		//handling here
-		tp.PostJob(PacketHandler::HandleData, received_data, &planeDataMap[received_data.Id]);
+		//if plane is not worked on
+		if (planeLocks[received_data.Id] == false) {
+			//post the job
+			planeLocksLock.lock();
+			planeLocks[received_data.Id] = true;
+			planeLocksLock.unlock();
+			tp.PostJob(PacketHandler::HandleData, received_data, &planeList[received_data.Id], &planeLocks, &planeLocksLock);
+		}
+		else {
+			//send to intermediate queue
+			messageQueue.push_back(received_data);
+		}
 
-		planeDataMap[received_data.Id].Print();		// Was just checking to make sure the changes saved outside the function
-		received_data.Print();
-		//std::cout << "Received: " << std:: endl;
-		//std::cout << received_data.Id << " " << received_data.Timestamp << " " << received_data.FuelLevel << " " << received_data.EndTransmission << std::endl;
+		//process intermediate queue
+		for (auto iterator = messageQueue.begin(); iterator != messageQueue.end();) {
+			//if the plane is not locked
+			if (planeLocks[iterator->Id] == false) {
+				//dequeue task and post it to the threads
+				planeLocksLock.lock();
+				planeLocks[iterator->Id] = true;
+				planeLocksLock.unlock();
+				tp.PostJob(PacketHandler::HandleData, *iterator, &planeList[iterator->Id], &planeLocks, &planeLocksLock);
+				iterator = messageQueue.erase(iterator);
+			}
+		}
 	}
 
 	// Close socket and cleanup WSA.
